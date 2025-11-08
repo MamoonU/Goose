@@ -38,3 +38,16 @@
 stack_bottom:
     .skip 4096              ;Reserving 4096-byte stack
 stack_top:
+
+;Following code is the assembly which runs when kernel loads
+
+.section .text
+
+    start:                                  ;Start code, first entry
+        mov $stack_top, %esp                ;Moving stack pointer (esp) to the top of the stack
+        call kernel_main                    ;Call main C function
+
+        hang:
+            cli                             ;Disable CPU interrupts
+            hlt                             ;Halt CPU
+            jmp hang                        ;Loop and try again if fails

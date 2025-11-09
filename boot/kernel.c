@@ -41,10 +41,34 @@ void term_putc(char c) {
             break;
         }
 
-    default: {
-        const size_t index = (VGA_COLS * term_row) + 
+        default: {
+        const size_t index = (VGA_COLS * term_row) + term_col;
+        vga_buffer[index] = ((uint16_t)term_color << 8) | c;
+        term_col ++;
+        break;
+        }
+
     }
+
+    if (term_col >= VGA_COLS) {
+
+        term_col = 0;
+        term_row ++;
+
+    }
+
+    if (term_row >= VGA_ROWS) {
+
+        term_col = 0;
+        term_row = 0;
 
     }
 
 }
+
+void term_print(const char* str) {
+
+        for (size_t i = 0 ; str[i] != '\0'; i ++)
+            term_putc(str[i]);
+
+    }

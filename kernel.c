@@ -77,13 +77,13 @@ void terminal_setcolor(uint8_t color)                   //Function to set termin
 	terminal_color = color;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)     //
+void terminal_putentryat(char c, uint8_t color, size_t x, size_t y)     //Function to put character at specific position with specific color
 {
 	const size_t index = y * VGA_WIDTH + x;
 	terminal_buffer[index] = vga_entry(c, color);
 }
 
-void terminal_putchar(char c) 
+void terminal_putchar(char c)                                           //Function to put character at current position and advance cursor
 {
 	terminal_putentryat(c, terminal_color, terminal_column, terminal_row);
 	if (++terminal_column == VGA_WIDTH) {
@@ -93,50 +93,20 @@ void terminal_putchar(char c)
 	}
 }
 
-
-void term_init() {
-
-    for (int col = 0; col < VGA_COLS; col ++) {
-        for (int row = 0; row < VGA_ROWS; row ++) {
-            const size_t index = (VGA_COLS * row) + col;
-            vga_buffer[index] = ((uint16_t)term_colour << 8) | ' ';
-        }
-    }
-
+void terminal_write(const char* data, size_t size)              //Function to write a string of given size to terminal
+{
+	for (size_t i = 0; i < size; i++)
+		terminal_putchar(data[i]);
 }
 
-void term_putc(char c) {
-
-    switch (c) {
-
-        case '\n': {
-            term_col = 0;
-            term_row ++;
-            break;
-        }
-
-        default: {
-        const size_t index = (VGA_COLS * term_row) + term_col;
-        vga_buffer[index] = ((uint16_t)term_colour << 8) | c;
-        term_col ++;
-        break;
-        }
-
-    }
-
+void terminal_writestring(const char* data)                     //Function to write null-terminated string to terminal
+{
+	terminal_write(data, strlen(data));
 }
 
-void term_print(const char* str) {
+void kernel_main(void)                                          //Kernel main function
+{
+	terminal_initialize();
 
-        for (size_t i = 0 ; str[i] != '\0'; i ++)
-            term_putc(str[i]);
-
-    }
-
-void kernel_main() {
-
-    term_init();
-
-    term_print("@kernel - hello world");
-
+	terminal_writestring("kernel: hello world");
 }
